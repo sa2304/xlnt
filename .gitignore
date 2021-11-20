@@ -19,3 +19,5 @@ python/xlntpyarrow.egg-info/
 /x64/
 .envrc
 .vscode
+cmake-build-*
+.idea

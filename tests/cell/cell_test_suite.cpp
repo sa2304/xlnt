@@ -83,9 +83,40 @@ public:
         register_test(test_comment);
         register_test(test_copy_and_compare);
         register_test(test_cell_phonetic_properties);
+        register_test(test_read_string_as_integer);
     }
 
 private:
+    void test_read_string_as_integer() {
+        {
+            xlnt::workbook wb;
+            auto ws = wb.active_sheet();
+            auto cell = ws.cell("A1");
+            cell.value(std::string{"b"});
+            xlnt_assert_equals(0, cell.value<int>());
+            xlnt_assert_equals(std::string{"b"}, cell.value<std::string>());
+        }
+
+        // load from file
+        {
+            xlnt::workbook wb;
+            wb.load("character.xlsx");
+            auto ws = wb.active_sheet();
+            auto cell = ws.cell("A1");
+            xlnt_assert_equals(0, cell.value<int>());
+            xlnt_assert_equals(std::string{"b"}, cell.value<std::string>());
+        }
+        {
+            xlnt::workbook wb;
+            wb.load("quantity-is-character.xlsx");
+            auto ws = wb.active_sheet();
+            auto cell = ws.cell("D4");
+            std::cerr << cell.value<int>() << std::endl;
+            xlnt_assert_equals(std::string{"b"}, cell.value<std::string>());
+            xlnt_assert_equals(0, cell.value<int>());
+        }
+    }
+
     void test_infer_numeric()
     {
         xlnt::workbook wb;
@@ -651,6 +682,9 @@ private:
         cell2.value(std::string(100000, 'a'));
         cell.value(cell2);
         xlnt_assert_equals(cell.value<std::string>(), std::string(32767, 'a'));
+
+        cell.value(std::string{10, 'a'});
+        std::cerr << cell.value<int>() << std::endl;
     }
 
     void test_reference()
